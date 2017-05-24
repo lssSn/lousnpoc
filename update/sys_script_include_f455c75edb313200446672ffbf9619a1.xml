@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_17651_trade_plan.FinancialInfo</api_name>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>FinancialInfo</name>
+        <script><![CDATA[var FinancialInfo = Class.create();
+FinancialInfo.prototype = {
+    initialize: function() {
+		
+    },
+	
+	populate: function(stockRec){
+		/* first, remove the data to start fresh */
+		var gr = new GlideRecord("x_17651_trade_plan_financial_information");
+		gr.addQuery("stock", stockRec.sys_id);
+		gr.deleteMultiple();
+
+		this.populateSales(stockRec);
+		this.wait(60000);
+		this.populateEarnings(stockRec);
+		this.populateCurrentRatio(stockRec);
+		this.populatePeRatio(stockRec);
+		this.calculateSalesGrowth(stockRec);
+		this.calculateEarningsGrowth(stockRec);
+		//if possible, get sector, industry, and industry pe ratio
+	},
+	
+	populateSales: function(stockRec){
+			
+		var apiObj = new FinancialInfoAPI(stockRec.symbol);
+		var salesObj = apiObj.getSales();
+		var gr = new GlideRecord("x_17651_trade_plan_financial_information");			
+		
+		for(i=0; i < 3; i++){
+			gr.initialize();
+			gr.stock = stockRec.sys_id;
+			gr.year = salesObj[i].date.substr(0, salesObj[i].date.indexOf('T')); 
+			gr.type = "sales";
+			gr.value = salesObj[i].sales;
+			gr.insert();			
+		}
+
+	},
+	
+	populateEarnings: function(stockRec){
+
+		var apiObj = new FinancialInfoAPI(stockRec.symbol);
+		var earningsObj = apiObj.getEarnings();
+		var gr = new GlideRecord("x_17651_trade_plan_financial_information");			
+		
+		for(i=0; i < 3; i++){
+			gr.initialize();
+			gr.stock = stockRec.sys_id;
+			gr.year = earningsObj[i].date.substr(0, earningsObj[i].date.indexOf('T')); 
+			gr.type = "net_income";
+			gr.value = earningsObj[i].earnings;
+			gr.insert();			
+		}				
+	},
+	
+	populateCurrentRatio: function(stockRec){
+		var apiObj = new FinancialInfoAPI(stockRec.symbol);
+		stockRec.current_ratio = apiObj.getCurrentRatio();
+		stockRec.update();
+	},
+	
+	populatePeRatio: function(stockRec){
+		var apiObj = new FinancialInfoAPI(stockRec.symbol);
+		stockRec.pe_ratio = apiObj.getPeRatio();
+		stockRec.update();
+	},
+	
+	calculateSalesGrowth: function(stockRec){
+		var valArray = [];
+		var gr = new GlideRecord("x_17651_trade_plan_financial_information");
+		gr.addQuery("stock", stockRec.sys_id);
+		gr.addQuery("type", "sales");
+		gr.orderBy("year");
+		gr.query();
+		
+		while (gr.next()) {
+			valArray.push(gr.value.toString());
+		}
+		
+		var sales1 = (parseInt(valArray[1]) - parseInt(valArray[0])) / parseInt(valArray[0]);
+		var sales2 = (parseInt(valArray[2]) - parseInt(valArray[1])) / parseInt(valArray[1]);
+		stockRec.sales_growth_rate = (sales1 + sales2)/2;
+		stockRec.sales_growth_rate = (stockRec.sales_growth_rate*100).toFixed(2);
+		stockRec.update();
+	},
+	
+	calculateEarningsGrowth: function(stockRec){
+		var valArray = [];
+		var gr = new GlideRecord("x_17651_trade_plan_financial_information");
+		gr.addQuery("stock", stockRec.sys_id);
+		gr.addQuery("type", "net_income");
+		gr.orderBy("year");
+		gr.query();
+		
+		while (gr.next()) {
+			valArray.push(gr.value.toString());
+		}
+		
+		var ni1 = (parseInt(valArray[1]) - parseInt(valArray[0])) / parseInt(valArray[0]);
+		var ni2 = (parseInt(valArray[2]) - parseInt(valArray[1])) / parseInt(valArray[1]);
+		stockRec.earnings_growth_rate = (ni1 + ni2)/2;
+		stockRec.earnings_growth_rate = (stockRec.earnings_growth_rate*100).toFixed(2);
+		stockRec.update();		
+	},
+	
+	/* time is in milliseconds - this is essentially a "sleep" function */
+	wait: function(time){
+		var t1 = new GlideDateTime().getNumericValue();
+		var t2 = new GlideDateTime().getNumericValue();
+		var duration = t2 - t1;
+		while(duration < time){
+			t2 = new GlideDateTime().getNumericValue();
+			duration = t2 - t1;
+		}		
+	},
+
+    type: 'FinancialInfo'
+};]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2017-03-31 20:02:05</sys_created_on>
+        <sys_customer_update>true</sys_customer_update>
+        <sys_id>f455c75edb313200446672ffbf9619a1</sys_id>
+        <sys_mod_count>78</sys_mod_count>
+        <sys_name>FinancialInfo</sys_name>
+        <sys_package display_value="Trade Planner" source="x_17651_trade_plan">c4c8f002db313200446672ffbf961952</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="Trade Planner">c4c8f002db313200446672ffbf961952</sys_scope>
+        <sys_update_name>sys_script_include_f455c75edb313200446672ffbf9619a1</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2017-04-06 16:12:18</sys_updated_on>
+    </sys_script_include>
+</record_update>

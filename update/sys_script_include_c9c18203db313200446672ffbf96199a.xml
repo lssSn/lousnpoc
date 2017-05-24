@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_17651_trade_plan.FinancialInfoAPI</api_name>
+        <client_callable>false</client_callable>
+        <description>This script include is designed to be easily replaced if we need to use another API.  In that event, a duplicate of this script include will be created and this one will be marked inactive.  The duplicated script include will be altered to use the different API.  As long as the functions are named the same, all of the other code dependent upon this won't be disrupted.</description>
+        <name>FinancialInfoAPI</name>
+        <script><![CDATA[var FinancialInfoAPI = Class.create();
+FinancialInfoAPI.prototype = {
+    initialize: function(symbol) {
+		this.symbol = symbol;
+    },
+	
+	/* takes in a stock table record, returns a JSON object
+	 * with the last three years of sales. */
+	getSales: function(){
+	
+		var jsonData = {};
+		var jsonObject;
+		var resp;
+		
+		for (i=0; i < 3; i++){
+			resp = this.sendAPIQuery(this.symbol, "operations", "10-K", i);
+			jsonObject = JSON.parse(resp);
+			jsonData[i] = {};
+			jsonData[i]["date"] = jsonObject.FilingDate;
+			jsonData[i]["sales"] = jsonObject.Data.SalesRevenueGoodsNet;	
+		}
+		
+		return jsonData;
+	},
+	
+	/* takes in a stock table record, returns a JSON object
+	 * with the last three years of net earnings. */
+	getEarnings: function(){
+	
+		var jsonData = {};
+		var jsonObject;
+		var resp;
+		
+		for (i=0; i < 3; i++){
+			resp = this.sendAPIQuery(this.symbol, "income", "10-K", i);
+			jsonObject = JSON.parse(resp);
+			jsonData[i] = {};
+			jsonData[i]["date"] = jsonObject.FilingDate;
+			jsonData[i]["earnings"] = jsonObject.Data.ProfitLoss;	
+		}
+
+		return jsonData;
+	},
+	
+	/* get the latest quarter's current ratio */
+	getCurrentRatio: function(){
+		resp = this.sendAPIQuery(this.symbol, "ratios");
+		jsonObject = JSON.parse(resp);
+		return jsonObject["CurrentRatio"].Recent["Latest Qtr"];
+	},
+	
+	/* get latest pe ratio */
+	getPeRatio: function(){
+		resp = this.sendAPIQuery(this.symbol, "quote");
+		jsonObject = JSON.parse(resp);
+		return jsonObject["PeRatio"];
+	},
+	
+	/* takes in API parameters, returns response body */
+	sendAPIQuery: function(symbol, api, formType, filingOrder){
+		var requestBody;
+		var responseBody;
+		var status;
+		var sm;
+		try{
+			sm = new sn_ws.RESTMessageV2("Last10K", "get");  
+			sm.setStringParameter("symbol", symbol);
+			sm.setStringParameter("api", api);
+			if(formType != ""){
+				sm.setQueryParameter("formType", formType);
+			}
+			
+			if(filingOrder != ""){
+				sm.setQueryParameter("filingOrder", filingOrder);
+			}
+			sm.setHttpTimeout(20000); //In milliseconds. Wait at most 20 seconds for response from http request			
+			response = sm.execute();
+			responseBody = response.haveError() ? response.getErrorMessage() : response.getBody();									
+			status = response.getStatusCode();
+		} catch(ex) {
+			responseBody = ex.getMessage();
+			status = '500';
+		} finally {
+			requestBody = sm ? sm.getRequestBody():null;
+		}
+		
+		return responseBody;
+	},
+
+    type: 'FinancialInfoAPI'
+};]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2017-04-02 23:01:28</sys_created_on>
+        <sys_customer_update>true</sys_customer_update>
+        <sys_id>c9c18203db313200446672ffbf96199a</sys_id>
+        <sys_mod_count>75</sys_mod_count>
+        <sys_name>FinancialInfoAPI</sys_name>
+        <sys_package display_value="Trade Planner" source="x_17651_trade_plan">c4c8f002db313200446672ffbf961952</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="Trade Planner">c4c8f002db313200446672ffbf961952</sys_scope>
+        <sys_update_name>sys_script_include_c9c18203db313200446672ffbf96199a</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2017-04-06 00:32:20</sys_updated_on>
+    </sys_script_include>
+</record_update>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database>
+    <element label="Stocks" max_length="40" name="x_17651_trade_plan_stocks" type="collection">
+        <element label="Current Ratio" max_length="40" name="current_ratio" type="float"/>
+        <element label="Earnings Growth Rate (%)" max_length="40" name="earnings_growth_rate" type="float"/>
+        <element choice="1" label="Health" max_length="40" name="health" type="choice">
+            <choice>
+                <element label="Excellent" sequence="0" value="excellent"/>
+                <element label="Good" sequence="1" value="good"/>
+                <element label="Fair" sequence="2" value="fair"/>
+                <element label="Poor" sequence="3" value="poor"/>
+            </choice>
+        </element>
+        <element dynamic_creation="true" label="Industry" max_length="32" name="industry" reference="x_17651_trade_plan_industries" type="reference"/>
+        <element label="PE Ratio" max_length="40" name="pe_ratio" type="float"/>
+        <element choice="1" label="Pricing" max_length="40" name="pricing" type="choice">
+            <choice>
+                <element label="Over Priced" value="over_priced"/>
+                <element label="Priced Correctly" value="priced_correctly"/>
+                <element label="Under Priced" value="under_priced"/>
+            </choice>
+        </element>
+        <element label="Sales Growth Rate (%)" max_length="40" name="sales_growth_rate" type="float"/>
+        <element dynamic_creation="true" label="Sector" max_length="40" name="sector" reference="x_17651_trade_plan_sectors" type="reference"/>
+        <element display="true" label="Symbol" max_length="10" name="symbol" type="string"/>
+        <index name="index">
+            <element name="industry"/>
+        </index>
+    </element>
+</database>

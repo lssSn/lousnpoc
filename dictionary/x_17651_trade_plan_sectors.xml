@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database>
+    <element label="Sectors" max_length="40" name="x_17651_trade_plan_sectors" type="collection">
+        <element label="Name" max_length="200" name="name" type="string"/>
+        <element label="PE Ratio" max_length="40" name="pe_ratio" type="float"/>
+    </element>
+</database>

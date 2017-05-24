@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record_update table="sys_security_acl_role">
+    <sys_security_acl_role action="INSERT_OR_UPDATE">
+        <sys_class_name>sys_security_acl_role</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2017-03-31 00:18:50</sys_created_on>
+        <sys_customer_update>true</sys_customer_update>
+        <sys_id>abb6b2cedb713200446672ffbf961994</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>x_17651_trade_plan_financial_information.x_17651_trade_plan_financial_information_user</sys_name>
+        <sys_package display_value="Trade Planner" source="x_17651_trade_plan">c4c8f002db313200446672ffbf961952</sys_package>
+        <sys_policy/>
+        <sys_replace_on_upgrade>false</sys_replace_on_upgrade>
+        <sys_scope display_value="Trade Planner">c4c8f002db313200446672ffbf961952</sys_scope>
+        <sys_security_acl display_value="x_17651_trade_plan_financial_information">afb6b2cedb713200446672ffbf961993</sys_security_acl>
+        <sys_update_name>sys_security_acl_role_abb6b2cedb713200446672ffbf961994</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2017-03-31 00:18:50</sys_updated_on>
+        <sys_user_role display_value="x_17651_trade_plan_financial_information_user" name="x_17651_trade_plan_financial_information_user">17b6b2cedb713200446672ffbf96192a</sys_user_role>
+        <transaction_id/>
+    </sys_security_acl_role>
+</record_update>
